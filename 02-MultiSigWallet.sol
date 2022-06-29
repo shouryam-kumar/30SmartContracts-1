@@ -8,9 +8,11 @@ contract MultiSigWallet {
     // - Can Submit , Approve and confirm Tx by any owner
     // - Check the Transactions and confirmations
 
+    // Array to store the address of wallet owners  
     address[] owners; // ["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2", "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"]
-    uint256 index;
+    uint256 index; // to store the Proposal number -> The first proposal is marked as 0 index. Hence nth proposal has n-1 index
 
+    // constructor takes the array of owner addresses as the parameter
     constructor(address[] memory _owners) {
         require(_owners.length > 1, "No. of owners cannot be less than two");
 
@@ -20,6 +22,7 @@ contract MultiSigWallet {
         }
     }
 
+    // The struct to make a proposal
     struct Proposal {
         uint256 _index;
         string title;
@@ -32,8 +35,10 @@ contract MultiSigWallet {
         bool executed;
     }
 
+    // Array of proposals to store proposals
     Proposal[] public proposals;
 
+    // checks if the address is one of the owners 
     modifier onlyOwner() {
         bool owner;
         for (uint256 i = 0; i < owners.length; i++) {
@@ -45,6 +50,7 @@ contract MultiSigWallet {
         require(owner, "You are not eligible");
     }
 
+    // function to make a proposal 
     function proposeTransaction(
         string memory _title,
         address _to,
@@ -67,6 +73,7 @@ contract MultiSigWallet {
         index++;
     }
 
+    // function to vote on made proposal 
     function voteOnTransaction(uint256 _index)
         public
         onlyOwner
@@ -90,6 +97,7 @@ contract MultiSigWallet {
         );
     }
 
+    // function to execute the transaction -> any owner can execute if proposal has sufficient votes
     function executeTransaction(uint256 _index) public onlyOwner {
         require(
             proposals[_index].executed == false &&
@@ -104,6 +112,7 @@ contract MultiSigWallet {
         proposals[_index].executed = true;
     }
 
+    // to delete the proposal if it has not been executed -> can be performed only by the proposer
     function abortProposal(uint256 _index) public onlyOwner {
         require(
             proposals[_index].executed == false &&
@@ -113,10 +122,13 @@ contract MultiSigWallet {
         delete proposals[_index];
     }
 
+    // returns the owners
     function getOwners() public view returns (address[] memory) {
         return owners;
     }
 
+
+    // to receive the payments in the contracts
     receive() external payable {}
 
     fallback() external payable {}
