@@ -10,7 +10,12 @@ contract Todo {
     event TaskAdded(uint256 _index, string _taskName, string _priorityLevel);
     event TaskCompleted(uint256 _index, string _taskName);
 
+    address owner;
     uint256 index;
+
+    constructor() {
+        owner = msg.sender;
+    }
 
     struct Task {
         uint256 _index;
@@ -21,8 +26,14 @@ contract Todo {
 
     Task[] tasks;
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "You are not authorized!");
+        _;
+    }
+
     function addTask(string memory _taskName, string memory _priorityLevel)
         public
+        onlyOwner
     {
         Task memory task = Task({
             _index: index,
@@ -40,7 +51,7 @@ contract Todo {
         return tasks;
     }
 
-    function markAsComplete(uint256 _taskIndex) public {
+    function markAsComplete(uint256 _taskIndex) public onlyOwner {
         require(tasks[_taskIndex].completed != true, "Task already completed");
         tasks[_taskIndex].completed = true;
 
