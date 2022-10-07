@@ -9,7 +9,8 @@ contract Voting{
 
     // struct of proposals to be created with all the details required
     struct Proposal {
-        //  proposal-  what proposal is  
+        //  proposal-  what proposal is 
+        // this is a sample change 
         string proposal_;
         // deadline - timestamp until which this proposal is active 
         uint256 deadline;
